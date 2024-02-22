@@ -95,3 +95,30 @@ resource "aws_route_table_association" "association_2" {
   subnet_id = aws_subnet.subnet_2.id
   route_table_id = aws_route_table.rt_1.id
 }
+
+resource "aws_security_group" "sg_1" {
+  name = "${var.prefix}-sg-1"
+  // 인바운드 트래픽 규칙을 설정
+  // 여기서는 모든 프로토콜, 모든 포트에 대해 모든 IP(0.0.0.0/0)로부터의 트래픽을 허용
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "all"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  // 아웃바운드 트래픽 규칙을 설정
+  // 여기서는 모든 프로토콜, 모든 포트에 대해 모든 IP(0.0.0.0/0)로의 트래픽을 허용
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "all"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  vpc_id = aws_vpc.vpc_1.id
+
+  tags = {
+    Name = "${var.prefix}-sg-1"
+  }
+}
