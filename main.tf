@@ -64,6 +64,22 @@ resource "aws_subnet" "subnet_2" {
   }
 }
 
+// AWS 서브넷 리소스를 생성하고 이름을 'subnet_3'로 설정
+resource "aws_subnet" "subnet_3" {
+  // 이 서브넷이 속할 VPC를 지정. 여기서는 'vpc_1'를 선택
+  vpc_id                  = aws_vpc.vpc_1.id
+  // 서브넷의 IP 주소 범위를 설정
+  cidr_block              = "10.0.3.0/24"
+  // 서브넷이 위치할 가용 영역을 설정
+  availability_zone       = "${var.region}c"
+  // 이 서브넷에 배포되는 인스턴스에 공용 IP를 자동으로 할당
+  map_public_ip_on_launch = true
+
+  // 리소스에 대한 태그를 설정
+  tags = {
+    Name = "${var.prefix}-subnet-3"
+  }
+}
 
 
 resource "aws_internet_gateway" "igw_1" {
@@ -98,6 +114,10 @@ resource "aws_route_table_association" "association_2" {
   route_table_id = aws_route_table.rt_1.id
 }
 
+resource "aws_route_table_association" "association_3" {
+  subnet_id = aws_subnet.subnet_3.id
+  route_table_id = aws_route_table.rt_1.id
+}
 
 resource "aws_security_group" "sg_1" {
   name = "${var.prefix}-sg-1"
@@ -198,7 +218,7 @@ resource "aws_instance" "ec2_2" {
   # EC2 인스턴스 유형
   instance_type               = "t2.micro"
   # 사용할 서브넷 ID
-  subnet_id                   = aws_subnet.subnet_2.id
+  subnet_id                   = aws_subnet.subnet_3.id
   # 적용할 보안 그룹 ID
   vpc_security_group_ids      = [aws_security_group.sg_1.id]
   # 퍼블릭 IP 연결 설정
