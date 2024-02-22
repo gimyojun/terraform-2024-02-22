@@ -63,3 +63,35 @@ resource "aws_subnet" "subnet_2" {
     Name = "${var.prefix}-subnet-2"
   }
 }
+
+resource "aws_internet_gateway" "igw_1" {
+  vpc_id = aws_vpc.vpc_1.id
+  tags = {
+    Name = "${var.prefix}-igw-1"
+  }
+}
+// aws 라우트 테이블 리소스를 생성하고 이름을 rt_1로 설정
+resource "aws_route_table" "rt_1" {
+  vpc_id = aws_vpc.vpc_1.id
+// 라우트 규칙을 설정. 모든 트래픽(0.0.0.0/0)을 igw_1 인터넷 게이트웨이로 보냄
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw_1.id
+  }
+
+  tags = {
+    Name = "${var.prefix}-rt-1"
+  }
+
+}
+
+resource "aws_route_table_association" "association_1" {
+  subnet_id = aws_subnet.subnet_1.id
+  route_table_id = aws_route_table.rt_1.id
+}
+
+
+resource "aws_route_table_association" "association_2" {
+  subnet_id = aws_subnet.subnet_2.id
+  route_table_id = aws_route_table.rt_1.id
+}
